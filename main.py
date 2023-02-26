@@ -33,6 +33,7 @@ colors = {0: (204, 192, 179),
 board_values = [[0 for _ in range(4)] for _ in range(4)]
 game_over = False
 spawn_new = True
+init_count = 0
 
 
 # Spawn New
@@ -89,9 +90,10 @@ while run:
     screen.fill("gray")
     draw_board()
     draw_pieces(board_values)
-    if spawn_new:
+    if spawn_new or init_count < 2:
         board_values, game_over = new_pieces(board_values)
         spawn_new = False
+        init_count += 1
 
     for event in pg.event.get():
         if event.type == pg.QUIT:
