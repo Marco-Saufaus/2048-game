@@ -35,10 +35,25 @@ game_over = False
 spawn_new = True
 init_count = 0
 direction = ""
+score = 0
+file = open("high_score.txt", "r")
+init_high_score = int(file.readline())
+file.close()
+high_score = init_high_score
+
+
+# draw Game Over and Restart text
+def draw_over():
+    pg.draw.rect(screen, "black", [50, 50, 300, 100], 0, 10)
+    game_over_text1 = font.render("Game Over!", True, "white")
+    game_over_text2 = font.render("Press Enter to Restart!", True, "white")
+    screen.blit(game_over_text1, (130, 65))
+    screen.blit(game_over_text2, (70, 105))
 
 
 # Take Turn based on Direction
 def take_turn(direction, board):
+    global score
     merged = [[False for _ in range(4)] for _ in range(4)]
     if direction == "UP":
         for i in range(4):
@@ -54,6 +69,7 @@ def take_turn(direction, board):
                     if board[i - shift - 1][j] == board[i - shift][j] and not merged[i - shift - 1][j] \
                             and not merged[i - shift][j]:
                         board[i - shift - 1][j] *= 2
+                        score += board[i - shift - 1][j]
                         board[i - shift][j] = 0
                         merged[i - shift - 1][j] = True
     elif direction == "DOWN":
@@ -70,6 +86,7 @@ def take_turn(direction, board):
                     if board[2 - i + shift][j] == board[3 - i + shift][j] and not merged[3 - i + shift][j] \
                             and not merged[2 - i + shift][j]:
                         board[3 - i + shift][j] *= 2
+                        score += board[3 - i + shift][j]
                         board[2 - i + shift][j] = 0
                         merged[3 - i + shift][j] = True
     elif direction == "LEFT":
@@ -85,6 +102,7 @@ def take_turn(direction, board):
                 if board[i][j - shift] == board[i][j - shift - 1] and not merged[i][j - shift - 1] \
                         and not merged[i][j - shift]:
                     board[i][j - shift -1] *= 2
+                    score += board[i][j - shift -1]
                     board[i][j - shift] = 0
                     merged[i][j - shift - 1] = True
     elif direction == "RIGHT":
@@ -101,6 +119,7 @@ def take_turn(direction, board):
                     if board[i][4 - j + shift] == board[i][3 - j + shift] and not merged[i][4 - j + shift] \
                             and not merged[i][3 - j + shift]:
                         board[i][4 - j + shift] *= 2
+                        score += board[i][4 - j + shift]
                         board[i][3 - j + shift] = 0
                         merged[i][4 - j + shift] = True
     return board
@@ -127,6 +146,10 @@ def new_pieces(board):
 # Draw Board Background
 def draw_board():
     pg.draw.rect(screen, colors["bg"], [0, 0, 400, 400], 0, 10)
+    score_text = font.render(f"Score: {score}", True, "black")
+    high_score_text = font.render(f"High Score: {high_score}", True, "black")
+    screen.blit(score_text, (10, 410))
+    screen.blit(high_score_text, (10, 450))
     pass
 
 
@@ -168,6 +191,13 @@ while run:
         board_values = take_turn(direction, board_values)
         direction = ""
         spawn_new = True
+    if game_over:
+        draw_over()
+        if high_score > init_high_score:
+            file = open("high_score.txt", "w")
+            file.write(f"{high_score}")
+            file.close()
+            init_high_score = high_score
 
     for event in pg.event.get():
         if event.type == pg.QUIT:
@@ -182,4 +212,17 @@ while run:
             elif event.key == pg.K_RIGHT:
                 direction = "RIGHT"
 
+            if game_over:
+                if event.key == pg.K_RETURN:
+                    board_values = [[0 for _ in range(4)] for _ in range(4)]
+                    spawn_new = True
+                    init_count = 0
+                    score = 0
+                    direction = ""
+                    game_over = False
+
+    if score > high_score:
+        high_score = score
+
     pg.display.flip()
+pg.quit()
