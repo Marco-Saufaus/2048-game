@@ -31,6 +31,26 @@ colors = {0: (204, 192, 179),
 
 # Initialize Game variables
 board_values = [[0 for _ in range(4)] for _ in range(4)]
+game_over = False
+spawn_new = True
+
+
+# Spawn New
+def new_pieces(board):
+    count = 0
+    full = False
+    while any(0 in row for row in board) and count < 1:
+        row = random.randint(0, 3)
+        column = random.randint(0, 3)
+        if board[row][column] == 0:
+            count += 1
+            if random.randint(1, 10) == 10:
+                board[row][column] = 4
+            else:
+                board[row][column] = 2
+    if count < 1:
+        full = True
+    return board, full
 
 
 # Draw Board Background
@@ -52,7 +72,15 @@ def draw_pieces(board):
                 color = colors[value]
             else:
                 color = colors["other"]
-            pg.draw.rect(screen, color, [j * 95 + 20, i * 95 + 20, 75, 75], 0, 5)
+            pg.draw.rect(screen, color, [j * 95 + 20, i * 95 + 20, 75, 75], 0, 10)
+            if value > 0:
+                value_len = len(str(value))
+                font = pg.font.Font("freesansbold.ttf", 48 - (5 * value_len))
+                value_text = font.render(str(value), True, value_color)
+                text_rect = value_text.get_rect(center=(j * 95 + 57, i * 95 + 57))
+                screen.blit(value_text, text_rect)
+                pg.draw.rect(screen, "black", [j * 95 + 20, i * 95 + 20, 75, 75], 2, 5)
+
 
 # Main Game Loop
 run = True
@@ -61,6 +89,9 @@ while run:
     screen.fill("gray")
     draw_board()
     draw_pieces(board_values)
+    if spawn_new:
+        board_values, game_over = new_pieces(board_values)
+        spawn_new = False
 
     for event in pg.event.get():
         if event.type == pg.QUIT:
