@@ -34,6 +34,36 @@ board_values = [[0 for _ in range(4)] for _ in range(4)]
 game_over = False
 spawn_new = True
 init_count = 0
+direction = ""
+
+
+# Take Turn based on Direction
+def take_turn(direction, board):
+    merged = [[False for _ in range(4)] for _ in range(4)]
+    if direction == "UP":
+        for i in range(4):
+            for j in range(4):
+                shift = 0
+                if i > 0:
+                    for q in range(i):
+                        if board[q][j] == 0:
+                            shift += 1
+                    if shift > 0:
+                        board[i - shift][j] = board[i][j]
+                        board[i][j] = 0
+                    if board[i - shift - 1][j] == board[i - shift][j] and not merged[i - shift - 1][j] \
+                        and not merged[i - shift][j]:
+                        board[i - shift - 1][j] *= 2
+                        board[i - shift][j] = 0
+                        merged[i - shift - 1][j] = True
+    elif direction == "Down":
+        pass
+    elif direction == "LEFT":
+        pass
+    elif direction == "RIGHT":
+        pass
+
+    return board
 
 
 # Spawn New
@@ -94,9 +124,22 @@ while run:
         board_values, game_over = new_pieces(board_values)
         spawn_new = False
         init_count += 1
+    if direction != "":
+        board_values = take_turn(direction, board_values)
+        direction = ""
+        spawn_new = True
 
     for event in pg.event.get():
         if event.type == pg.QUIT:
             run = False
+        if event.type == pg.KEYUP:
+            if event.key == pg.K_UP or pg.K_w:
+                direction = "UP"
+            elif event.key == pg.K_DOWN or pg.K_s:
+                direction = "DOWN"
+            elif event.key == pg.K_LEFT or pg.K_a:
+                direction = "UP"
+            elif event.key == pg.K_RIGHT or pg.K_d:
+                direction = "UP"
 
     pg.display.flip()
