@@ -29,16 +29,30 @@ colors = {0: (204, 192, 179),
           "bg": (187, 173, 160)}
 
 
+# Initialize Game variables
+board_values = [[0 for _ in range(4)] for _ in range(4)]
+
+
 # Draw Board Background
 def draw_board():
-    pg.draw.rect(screen, (200, 200, 200), [0, 0, 400, 400], 0, 10)
+    pg.draw.rect(screen, colors["bg"], [0, 0, 400, 400], 0, 10)
     pass
 
 
 # Draw Game Tiles
-def draw_pieces():
-    pass
-
+def draw_pieces(board):
+    for i in range(4):
+        for j in range(4):
+            value = board[i][j]
+            if value > 8:
+                value_color = colors["light text"]
+            else:
+                value_color = colors["dark text"]
+            if value <= 2048:
+                color = colors[value]
+            else:
+                color = colors["other"]
+            pg.draw.rect(screen, color, [j * 95 + 20, i * 95 + 20, 75, 75], 0, 5)
 
 # Main Game Loop
 run = True
@@ -46,7 +60,7 @@ while run:
     timer.tick(FPS)
     screen.fill("gray")
     draw_board()
-    draw_pieces()
+    draw_pieces(board_values)
 
     for event in pg.event.get():
         if event.type == pg.QUIT:
