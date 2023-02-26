@@ -52,12 +52,26 @@ def take_turn(direction, board):
                         board[i - shift][j] = board[i][j]
                         board[i][j] = 0
                     if board[i - shift - 1][j] == board[i - shift][j] and not merged[i - shift - 1][j] \
-                        and not merged[i - shift][j]:
+                            and not merged[i - shift][j]:
                         board[i - shift - 1][j] *= 2
                         board[i - shift][j] = 0
                         merged[i - shift - 1][j] = True
-    elif direction == "Down":
-        pass
+    elif direction == "DOWN":
+        for i in range(3):
+            for j in range(4):
+                shift = 0
+                for q in range(i + 1):
+                    if board[3 - q][j] == 0:
+                        shift += 1
+                if shift > 0:
+                    board[2 - i + shift][j] = board[2 - i][j]
+                    board[2 - i][j] = 0
+                if 3 - i + shift <= 3:
+                    if board[2 - i + shift][j] == board[3 - i + shift][j] and not merged[3 - i + shift][j] \
+                            and not merged[2 - i + shift][j]:
+                        board[3 - i + shift][j] *= 2
+                        board[2 - i + shift][j] = 0
+                        merged[3 - i + shift][j] = True
     elif direction == "LEFT":
         pass
     elif direction == "RIGHT":
@@ -133,13 +147,13 @@ while run:
         if event.type == pg.QUIT:
             run = False
         if event.type == pg.KEYUP:
-            if event.key == pg.K_UP or pg.K_w:
+            if event.key == pg.K_UP:
                 direction = "UP"
-            elif event.key == pg.K_DOWN or pg.K_s:
+            elif event.key == pg.K_DOWN:
                 direction = "DOWN"
-            elif event.key == pg.K_LEFT or pg.K_a:
-                direction = "UP"
-            elif event.key == pg.K_RIGHT or pg.K_d:
-                direction = "UP"
+            elif event.key == pg.K_LEFT:
+                direction = "LEFT"
+            elif event.key == pg.K_RIGHT:
+                direction = "RIGHT"
 
     pg.display.flip()
